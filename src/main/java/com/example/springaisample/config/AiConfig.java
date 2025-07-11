@@ -2,6 +2,7 @@ package com.example.springaisample.config;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -24,6 +25,7 @@ public class AiConfig {
 				.defaultSystem("You are a helpful DBA who speaks like a RDB expert.")
 				.defaultAdvisors(
 						MessageChatMemoryAdvisor.builder(chatMemory()).build()
+						, new SimpleLoggerAdvisor()
 				)
 				.build();
 

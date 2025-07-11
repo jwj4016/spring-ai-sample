@@ -1,10 +1,7 @@
 package com.example.springaisample;
 
-import com.example.springaisample.prompt.DatabaseSchemaLoader;
-import com.example.springaisample.prompt.PromptBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,9 +13,7 @@ import reactor.core.publisher.Flux;
 @RestController
 public class TestController {
 	private final ChatClient chatClient;
-	private final ChatMemory chatMemory;
-	private final DatabaseSchemaLoader databaseSchemaLoader;
-	private final PromptBuilder promptBuilder;
+	private final AiStreamService aiStreamService;
 
 	@GetMapping("/ai")
 	String testAi(String userInput, String role) {
@@ -44,11 +39,7 @@ public class TestController {
 	@CrossOrigin(origins = "*")
 	@GetMapping(value = "/stream/ai", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<String> testAiUsingStreaming(String userInput, String conversationId) {
-		return chatClient.prompt(promptBuilder.createPrompt(userInput))
-				.advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId))
-				.stream()
-				.content()
-				.takeUntil(s -> s.contains("\"done\":true"));
+		return aiStreamService.streamAiResponse(userInput, conversationId);
 	}
 
 	@CrossOrigin(origins = "*")

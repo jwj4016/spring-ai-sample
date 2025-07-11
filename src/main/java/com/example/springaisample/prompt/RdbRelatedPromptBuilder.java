@@ -2,19 +2,14 @@ package com.example.springaisample.prompt;
 
 import com.example.springaisample.DatabaseSchemaLoader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.template.st.StTemplateRenderer;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
-public class QueryExpertPromptBuilder implements PromptBuilder {
+public class RdbRelatedPromptBuilder implements PromptBuilder {
 	private final DatabaseSchemaLoader databaseSchemaLoader;
 
 	@Override
@@ -24,30 +19,27 @@ public class QueryExpertPromptBuilder implements PromptBuilder {
 				
 				            You will receive:
 				            - a relational database schema (H2-compatible),
+				            - a user question.
 				
 				            Your task is to:
-				            1. Write a valid H2 SQL query that answers the question.
-				            2. Describe the query in plain English.
-				            3. Respond strictly in JSON format as shown.
+				            1. Decide whether the user's question can be answered *only* by querying the given database schema.
+				            2. Respond strictly with 'YES' if it is possible, or 'NO' if not.
+				            3. Do not explain anything else. Do not include the query. Only reply with 'YES' or 'NO'.
 				
 				            Database schema:
 				            <schema>
 				
-				            Respond in the following format only:
-				            {
-				              "sql": "SELECT ...",
-				              "description": "This query ..."
-				            }
+				            User question:
+				            <question>
 				""";
-		PromptTemplate systemPromptTemplate = SystemPromptTemplate.builder()
+
+		PromptTemplate promptTemplate = PromptTemplate.builder()
 				.renderer(StTemplateRenderer.builder().startDelimiterToken('<').endDelimiterToken('>').build())
 				.template(command)
 				.build();
-		systemPromptTemplate.add("schema", databaseSchemaLoader.getSchemaDescription());
+		promptTemplate.add("schema", databaseSchemaLoader.getSchemaDescription());
+		promptTemplate.add("question", userInput);
 
-		Message userMessage = new UserMessage(userInput);
-		Message systemMessage = systemPromptTemplate.createMessage();
-
-		return new Prompt(List.of(userMessage, systemMessage));
+		return new Prompt(promptTemplate.createMessage());
 	}
 }

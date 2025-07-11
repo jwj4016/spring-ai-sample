@@ -1,4 +1,4 @@
-package com.example.springaisample.prompt;
+package com.example.springaisample;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,9 +12,12 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class DatabaseSchemaLoader {
+	private String cachedSchema;
 	private final JdbcTemplate jdbcTemplate;
 
 	public String getSchemaDescription() {
+		if(cachedSchema != null) return cachedSchema;
+
 		String sql = """
 				SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE
 				  FROM INFORMATION_SCHEMA.COLUMNS
@@ -41,7 +44,8 @@ public class DatabaseSchemaLoader {
 					.append(String.join(", ", entry.getValue())).append(")\n");
 		}
 
-		return builder.toString();
+		cachedSchema = builder.toString();
+		return cachedSchema;
 	}
 
 }

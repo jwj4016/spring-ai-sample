@@ -18,10 +18,11 @@ public class AiStreamService {
 	private final ChatClient chatClient;
 	private final Map<String, PromptBuilder> promptBuilders;
 
-	public Flux<String> streamAiResponse(String userInput, String conversationId) {
+	public Flux<String> streamAiResponse(String userInput, String conversationKey) {
 		// 1. RDB를 활용해 응답 가능한지 판단(LLM이 판단한다.)
 		String rdbCheckResult = chatClient.prompt(
 						promptBuilders.get("rdbRelatedPromptBuilder").createPrompt(userInput))
+				.advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationKey))
 				.call()
 				.content();
 
@@ -32,7 +33,7 @@ public class AiStreamService {
 
 		// 3. 스트리밍 응답 생성
 		return chatClient.prompt(selectedPromptBuilder.createPrompt(userInput))
-				.advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId))
+				.advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationKey))
 				.stream()
 				.content()
 				.takeUntil(s -> s.contains(DONE_SIGNAL));

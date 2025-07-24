@@ -38,8 +38,8 @@ public class TestController {
 
 	@CrossOrigin(origins = "*")
 	@GetMapping(value = "/stream/ai", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<String> testAiUsingStreaming(String userInput, String conversationId) {
-		return aiStreamService.streamAiResponse(userInput, conversationId);
+	public Flux<String> testAiUsingStreaming(String userInput, String conversationKey) {
+		return aiStreamService.streamAiResponse(userInput, conversationKey);
 	}
 
 	@CrossOrigin(origins = "*")

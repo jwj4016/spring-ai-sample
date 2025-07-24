@@ -29,7 +29,7 @@
 	<hr>
 	
 	<form id="chatForm">
-		<input type="text" id="conversationId" placeholder="대화 id" required />
+		<input type="text" id="conversationKey" placeholder="대화 id" required />
         <input type="text" id="userInput" placeholder="질문을 입력하세요" required />
         <button type="submit">전송</button>
     </form>
@@ -37,7 +37,7 @@
     <script>
         const form = document.getElementById("chatForm");
         const input = document.getElementById("userInput");
-		const input2 = document.getElementById("conversationId");
+		const input2 = document.getElementById("conversationKey");
         const chatBox = document.getElementById("chatBox");
         let eventSource = null;
 
@@ -45,8 +45,8 @@
             e.preventDefault();
 
             const query = input.value.trim();
-			const conversationId = input2.value.trim();
-            if (!query || !conversationId) return;
+			const conversationKey = input2.value.trim();
+            if (!query || !conversationKey) return;
 
             // 사용자 메시지 표시
             const userDiv = document.createElement("div");
@@ -66,7 +66,7 @@
             }
 
             // SSE 연결
-            eventSource = new EventSource("http://localhost:8080/stream/ai?conversationId=" + encodeURIComponent(conversationId) + "&userInput=" + encodeURIComponent(query));
+            eventSource = new EventSource("http://localhost:8888/stream/ai?conversationKey=" + encodeURIComponent(conversationKey) + "&userInput=" + encodeURIComponent(query));
 
             eventSource.onmessage = function (event) {
                 aiDiv.textContent += event.data + " ";

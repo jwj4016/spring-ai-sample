@@ -34,6 +34,7 @@ public class AiStreamService {
 		// 3. 스트리밍 응답 생성
 		return chatClient.prompt(selectedPromptBuilder.createPrompt(userInput))
 				.advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationKey))
+//				.tools(menuSearchTool)
 				.stream()
 				.content()
 				.takeUntil(s -> s.contains(DONE_SIGNAL));

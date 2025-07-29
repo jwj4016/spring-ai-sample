@@ -7,6 +7,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,15 +34,21 @@ public class AiConfig {
 	}
 
 	@Bean
+	@Qualifier("defaultChatClient")
 	ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory) {
 		return builder
-				.defaultSystem("You are a helpful DBA who speaks like a RDB expert.")
+//				.defaultSystem("You are a helpful DBA who speaks like a RDB expert.")
 				.defaultAdvisors(
 						MessageChatMemoryAdvisor.builder(chatMemory).build()
 						, new SimpleLoggerAdvisor()
 				)
 				.build();
+	}
 
+	@Bean
+	@Qualifier("lightweightChatClient")
+	public ChatClient lightweightChatClient(ChatClient.Builder builder) {
+		return builder.build();
 	}
 
 }

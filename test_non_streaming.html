@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LLM 대화 스트리밍</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user {
+            font-weight: bold;
+            color: #3366cc;
+        }
+        .ai {
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+<h1>AI 대화</h1>
+
+<hr>
+
+<div id="chatBox"></div>
+
+<hr>
+
+<form id="chatForm">
+    <input type="text" id="conversationKey" placeholder="대화 id" required />
+    <input type="text" id="role" placeholder="사용자 역할 (예: CM)" required />
+    <input type="text" id="userInput" placeholder="질문을 입력하세요" required />
+    <button type="submit">전송</button>
+</form>
+
+<script>
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("userInput");
+    const input2 = document.getElementById("conversationKey");
+    const inputRole = document.getElementById("role");
+    const chatBox = document.getElementById("chatBox");
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const query = input.value.trim();
+        const conversationKey = input2.value.trim();
+        const role = inputRole.value.trim();
+        if (!query || !conversationKey || !role) return;
+
+        // 사용자 메시지 표시
+        const userDiv = document.createElement("div");
+        userDiv.classList.add("message", "user");
+        userDiv.textContent = "🙋 사용자: " + query;
+        chatBox.appendChild(userDiv);
+
+        // AI 응답 영역 추가
+        const aiDiv = document.createElement("div");
+        aiDiv.classList.add("message", "ai");
+        aiDiv.textContent = "🤖 AI: ... 응답 대기 중";
+        chatBox.appendChild(aiDiv);
+
+        try {
+            const url = `http://localhost:8888/ai?conversationKey=${encodeURIComponent(conversationKey)}&userInput=${encodeURIComponent(query)}&role=${encodeURIComponent(role)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("응답 실패");
+
+            const text = await response.text();
+            aiDiv.textContent = "🤖 AI: " + text;
+        } catch (error) {
+            aiDiv.textContent = "🤖 AI: 오류 발생 - " + error.message;
+            console.error(error);
+        }
+
+        input.value = "";
+    });
+</script>
+</body>
+</html>

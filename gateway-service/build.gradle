@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(':ai-agent-service')
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+}

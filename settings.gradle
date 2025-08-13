@@ -1,1 +1,4 @@
 rootProject.name = 'spring-ai-sample'
+include 'ai-agent-service'
+include 'gateway-service'
+

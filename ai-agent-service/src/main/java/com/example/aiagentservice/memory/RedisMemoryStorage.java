@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class RedisMemoryStorage implements MemoryStorage {
@@ -64,5 +67,17 @@ public class RedisMemoryStorage implements MemoryStorage {
 	public int size(String userId, String sessionId) {
 		Long size = redisTemplate.opsForList().size(getKey(userId, sessionId));
 		return size == null ? 0 : size.intValue();
+	}
+
+	@Override
+	public List<Memory> peekLastN(String userId, String sessionId, int end) {
+		List<Object> values = redisTemplate.opsForList().range(getKey(userId, sessionId), -end, -1);
+		if (values == null) return Collections.emptyList();
+		Collections.reverse(values);
+
+		return values.stream()
+				.map(v -> (String) v)
+				.map(this::fromJson)
+				.collect(Collectors.toList());
 	}
 }

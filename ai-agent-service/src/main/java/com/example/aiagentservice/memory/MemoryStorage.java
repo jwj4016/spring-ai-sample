@@ -1,5 +1,7 @@
 package com.example.aiagentservice.memory;
 
+import java.util.List;
+
 public interface MemoryStorage {
 
 	/**
@@ -28,7 +30,12 @@ public interface MemoryStorage {
 	void deleteAll(String userId, String sessionId);
 
 	/**
-	 * user/session별 Memory 수 확인
+	 * user/session 별 Memory 수 확인
 	 */
 	int size(String userId, String sessionId);
+
+	/**
+	 * user/session 별 최근 n개의 Memory 반환
+	 */
+	List<Memory> peekLastN(String userId, String sessionId, int end);
 }

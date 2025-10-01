@@ -1,9 +1,6 @@
 package com.example.aiagentservice.memory;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryStorage implements MemoryStorage {
@@ -50,5 +47,22 @@ public class InMemoryStorage implements MemoryStorage {
 		Deque<Memory> memories = storage.getOrDefault(userId, Map.of())
 				.getOrDefault(sessionId, new ArrayDeque<>());
 		return memories.size();
+	}
+
+	@Override
+	public List<Memory> peekLastN(String userId, String sessionId, int n) {
+		Deque<Memory> deque = storage.getOrDefault(userId, Map.of())
+				.getOrDefault(sessionId, new ArrayDeque<>());
+		if (deque.isEmpty() || n <= 0) return Collections.emptyList();
+
+		List<Memory> result = new ArrayList<>(Math.min(n, deque.size()));
+		Iterator<Memory> descending = deque.descendingIterator();
+		int count = 0;
+		while (descending.hasNext() && count < n) {
+			result.add(descending.next());
+			count++;
+		}
+
+		return result;
 	}
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -111,5 +112,54 @@ public abstract class AbstractMemoryStorageTest {
 
 		// then
 		assertEquals(3, size);
+	}
+
+	@Test
+	void 최근_N개의_기억을_조회할_수_있다(){
+		// given
+		Memory memory1 = createMemory(userId, sessionId, "질문1", "응답1");
+		Memory memory2 = createMemory(userId, sessionId, "질문2", "응답2");
+		Memory memory3 = createMemory(userId, sessionId, "질문3", "응답3");
+		Memory memory4 = createMemory(userId, sessionId, "질문4", "응답4");
+		Memory memory5 = createMemory(userId, sessionId, "질문5", "응답5");
+
+		memoryStorage.addLast(memory1);
+		memoryStorage.addLast(memory2);
+		memoryStorage.addLast(memory3);
+		memoryStorage.addLast(memory4);
+		memoryStorage.addLast(memory5);//최근
+
+		//when
+		List<Memory> memories = memoryStorage.peekLastN(userId, sessionId, 4);
+
+		//then
+		assertNotNull(memories);
+		assertEquals(4, memories.size());
+		assertEquals(memory5, memories.get(0));
+		assertEquals(memory4, memories.get(1));
+		assertEquals(memory3, memories.get(2));
+		assertEquals(memory2, memories.get(3));
+	}
+
+	@Test
+	void 최근_N개의_기억을_조회할_때_N개의_기억이_없으면_N이하의_기억을_가져온다() {
+		//given
+		Memory memory1 = createMemory(userId, sessionId, "질문1", "응답1");
+		Memory memory2 = createMemory(userId, sessionId, "질문2", "응답2");
+		Memory memory3 = createMemory(userId, sessionId, "질문3", "응답3");
+
+		memoryStorage.addLast(memory1);
+		memoryStorage.addLast(memory2);
+		memoryStorage.addLast(memory3);//최근
+
+		//when
+		List<Memory> memories = memoryStorage.peekLastN(userId, sessionId, 4);
+
+		//then
+		assertNotNull(memories);
+		assertEquals(3, memories.size());
+		assertEquals(memory3, memories.get(0));
+		assertEquals(memory2, memories.get(1));
+		assertEquals(memory1, memories.get(2));
 	}
 }

@@ -15,6 +15,9 @@ dependencies {
 
     implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
     implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    testImplementation 'org.testcontainers:junit-jupiter'
 
     runtimeOnly 'com.h2database:h2'
 }
